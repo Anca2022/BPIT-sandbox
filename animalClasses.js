@@ -1,38 +1,51 @@
 class Animal {
-  constructor(name){
-    this.name = name; 
+  constructor(name) {
+    this.name = name;
   }
-  move(){
-    alert("The animal moves"); 
+  move() {
+    alert("The animal moves");
   }
 }
 
 class VocalAnimal extends Animal {
-  makeSound(){
-    alert("The animal makes a generic sound"); 
+  makeSound() {
+    alert("The animal makes a generic sound");
   }
 }
 
-export class Dog extends VocalAnimal{
-  makeSound(){
+class Dog extends VocalAnimal {
+  makeSound() {
     alert(`${this.name} makes wof-wof`);
   }
-  move(){
+  move() {
     alert(`${this.name} is zooming`);
   }
 }
 
-export class Horse extends VocalAnimal{
-  makeSound(){
+class Horse extends VocalAnimal {
+  makeSound() {
     alert(`${this.name} makes neight`);
   }
-  move(){
+  move() {
     alert(`${this.name} is galloping`);
   }
 }
 
-export class Fish extends Animal{
-  move(){
+class Fish extends Animal {
+  move() {
     alert(`${this.name} is swimming`);
   }
 }
+
+export class Factory {
+  createAnimal(type, name){
+    switch (type){
+      case "dog": 
+        return new Dog(name); 
+      case "horse": 
+        return new Horse(name); 
+      case "fish":
+        return new Fish(name)
+    }
+  }
+};
