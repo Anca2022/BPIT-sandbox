@@ -1,0 +1,34 @@
+body{
+  background-color:rgb(253, 246, 234);
+  display:flex;
+  flex-direction: column;
+  align-items: center;
+}
+.choose-animal{
+  margin-top: 2rem;
+}
+button{ 
+
+  background-color: #0a6c81;
+  border: 1px solid #264e56;
+  color:white;
+  border-radius: 0.7rem;
+  padding: 0.5rem 1rem;
+  margin-left: 1rem;
+}
+button:hover{
+  background-color: #264e56;
+  cursor: pointer;
+}
+.new-pet{
+  padding:1rem;
+  margin-top: 2rem;
+
+  min-width: 400px;
+  min-height: 300px;
+  border-radius: 0.5rem;
+}
+.new-pet div {
+  margin-bottom: 1rem;
+}
+
