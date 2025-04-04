@@ -18,9 +18,9 @@ async function setNationality(name) {
   const { countries } = await countriesJson.json();
   for (let country of countries) {
     country = country.toUpperCase();
+    name = name.toUpperCase();
     for (let i = 0; i < name.length; i++) {
-      name = name.toUpperCase();
-      let letter = name.charAt(i);
+      const letter = name.charAt(i);
       if (country.includes(letter)) {
         return country;
       }
@@ -29,7 +29,7 @@ async function setNationality(name) {
   return "RO - default nationality";
 }
 
-async function createAnimal(name, type, age) {
+async function createAnimal({ name, type, age }) {
   const animal = {
     _name: name,
     _age: setAge(name, age),
@@ -134,9 +134,9 @@ function makeMythical(a1, a2) {
 }
 
 async function createAndMixAnimals() {
-  const loki = await createAnimal("Loki", "dog", 7);
-  const tweety = await createAnimal("Tweety", "bird");
-  const thunder = await createAnimal("Thunder", "horse");
+  const loki = await createAnimal({ name: "Loki", type: "dog", age: 7 });
+  const tweety = await createAnimal({ name: "Tweety", type: "bird" });
+  const thunder = await createAnimal({ name: "Thunder", type: "horse" });
   const animals = [loki, tweety, thunder];
   for (let animal of animals) {
     console.log(
