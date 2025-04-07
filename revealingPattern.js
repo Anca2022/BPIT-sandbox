@@ -6,33 +6,10 @@ function getCountries() {
   });
 }
 
-function setAge(name, age) {
-  if (age != undefined) {
-    return age;
-  } else return name.length * 2;
-}
-
-async function setNationality(name) {
-  // nationality = determinatata de una din literele numelui [US,RO, DE] -> daca pe animal il cheama Dazy va fi in Prima tara care are o litera din nume.
-  const countriesJson = await getCountries();
-  const { countries } = await countriesJson.json();
-  for (let country of countries) {
-    country = country.toUpperCase();
-    name = name.toUpperCase();
-    for (let i = 0; i < name.length; i++) {
-      const letter = name.charAt(i);
-      if (country.includes(letter)) {
-        return country;
-      }
-    }
-  }
-  return "RO - default nationality";
-}
-
 async function createAnimal({ name, type, age }) {
   const animal = {
     _name: name,
-    _age: setAge(name, age),
+    _age: age ?? name.length * 2,
     _nationality: await setNationality(name),
     _type: type,
   };
@@ -73,6 +50,23 @@ async function createAnimal({ name, type, age }) {
       default:
         return "unknown animal";
     }
+  }
+
+  async function setNationality(name) {
+    // nationality = determinatata de una din literele numelui [US,RO, DE] -> daca pe animal il cheama Dazy va fi in Prima tara care are o litera din nume.
+    const countriesJson = await getCountries();
+    const { countries } = await countriesJson.json();
+    for (let country of countries) {
+      country = country.toUpperCase();
+      name = name.toUpperCase();
+      for (let i = 0; i < name.length; i++) {
+        const letter = name.charAt(i);
+        if (country.includes(letter)) {
+          return country;
+        }
+      }
+    }
+    return "RO - default nationality";
   }
   return { getName, getAge, getType, getCharacteristics, move, makeSound };
 }
@@ -134,19 +128,45 @@ function makeMythical(a1, a2) {
 }
 
 async function createAndMixAnimals() {
-  const loki = await createAnimal({ name: "Loki", type: "dog", age: 7 });
-  const tweety = await createAnimal({ name: "Tweety", type: "bird" });
-  const thunder = await createAnimal({ name: "Thunder", type: "horse" });
-  const animals = [loki, tweety, thunder];
-  for (let animal of animals) {
-    console.log(
-      `${animal.getCharacteristics()} It makes: ${animal.makeSound()} and it moves: ${animal.move()}.`
-    );
-  }
+  Promise.allSettled([
+    createAnimal({ name: "Loki", type: "dog", age: 7 }),
+    createAnimal({ name: "Tweety", type: "bird" }),
+    createAnimal({ name: "Thunder", type: "horse" }),
+  ])
+    .then((data) => {
+      data.forEach((item, index) => {
+        if (item.status === "fulfilled") {
+          console.log(
+            `${item.value.getCharacteristics()} It makes: ${item.value.makeSound()} and it moves: ${item.value.move()}.`
+          );
+          if (index < data.length - 1) {
+            makeMythical(item.value, data[index + 1].value);
+          }
+        }
+      });
+      const names = data.reduce((list, curr) => {
+        list.push(curr.value.getName());
+        return list;
+      }, []);
+      console.log(names);
+      // .find si .findIndex
+      const nameToFind = "Tweety2";
+      const animal = data.find(
+        (item) => item.value.getName() === nameToFind
+      )?.value;
+      const index = data.findIndex(
+        (item) => item.value.getName() === nameToFind
+      );
+      console.log(
+        `Animal with name ${nameToFind}: `,
+        animal ?? "No animal with this name found",
+        index !== -1 ? `found at index no: ${index} in animal list` : ""
+      );
+    })
 
-  makeMythical(tweety, thunder);
-  makeMythical(loki, thunder);
-  makeMythical(tweety, tweety);
+    .catch((err) => {
+      console.log(err);
+    });
 }
 
 createAndMixAnimals();
