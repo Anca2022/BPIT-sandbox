@@ -5,7 +5,6 @@ function getCountries() {
     }, 1000);
   });
 }
-
 async function createAnimal({ name, type, age }) {
   const animal = {
     _name: name,
@@ -53,20 +52,14 @@ async function createAnimal({ name, type, age }) {
   }
 
   async function setNationality(name) {
-    // nationality = determinatata de una din literele numelui [US,RO, DE] -> daca pe animal il cheama Dazy va fi in Prima tara care are o litera din nume.
     const countriesJson = await getCountries();
     const { countries } = await countriesJson.json();
-    for (let country of countries) {
-      country = country.toUpperCase();
-      name = name.toUpperCase();
-      for (let i = 0; i < name.length; i++) {
-        const letter = name.charAt(i);
-        if (country.includes(letter)) {
-          return country;
-        }
-      }
-    }
-    return "RO - default nationality";
+
+    const country = countries.find((country) =>
+      country.includes(name[0].toUpperCase())
+    );
+
+    return country ?? "RO - default nationality";
   }
   return { getName, getAge, getType, getCharacteristics, move, makeSound };
 }
@@ -168,5 +161,4 @@ async function createAndMixAnimals() {
       console.log(err);
     });
 }
-
 createAndMixAnimals();
