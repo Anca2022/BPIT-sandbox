@@ -1,0 +1,98 @@
+"use strict";
+class Animal {
+    constructor({ name, calculatedAge, nationality }) {
+        this._name = name;
+        this._age = calculatedAge;
+        this._nationality = nationality;
+    }
+    get name() {
+        return this._name;
+    }
+    get age() {
+        return this._age;
+    }
+    get characteristics() {
+        return `${this._name} is ${this._age} years old and it's nationality is: ${this._nationality}`;
+    }
+}
+class Dog extends Animal {
+    move() {
+        return "zooming";
+    }
+    makeSound() {
+        return `wof-wof`;
+    }
+    get characteristics() {
+        return `${super.characteristics}; it's a dog`;
+    }
+}
+class Horse extends Animal {
+    move() {
+        return "galloping";
+    }
+    makeSound() {
+        return `neight`;
+    }
+    get characteristics() {
+        return `${super.characteristics}; it's a horse`;
+    }
+}
+class MuteBird extends Animal {
+    //doesn't makeSound
+    move() {
+        return `flying`;
+    }
+    get characteristics() {
+        return `${super.characteristics}; it's a bird`;
+    }
+}
+class AnimalFactory {
+    static async createAnimal({ type, name, age }) {
+        const calculatedAge = age ?? name.length * 2;
+        const nationality = await AnimalFactory.createNationality(name);
+        switch (type) {
+            case "dog":
+                return new Dog({ name, calculatedAge, nationality });
+            case "horse":
+                return new Horse({ name, calculatedAge, nationality });
+            case "bird":
+                return new MuteBird({ name, calculatedAge, nationality });
+            default:
+                const exhaustiveCheck = type;
+                throw new Error(`Error: ${exhaustiveCheck}`);
+        }
+    }
+    static async createNationality(name) {
+        const firstLetter = name.charAt(0).toUpperCase();
+        const { countries } = await AnimalFactory.fetchCountries();
+        const country = countries.find((country) => country.includes(firstLetter));
+        return country ?? "RO-default";
+    }
+    static async fetchCountries() {
+        return new Promise((resolve) => {
+            setTimeout(async () => {
+                const result = await fetch("../javascriptEssentials/countries.json");
+                resolve(result.json());
+            }, 1000);
+        });
+    }
+}
+(async function () {
+    try {
+        const listOfPromises = (await Promise.allSettled([
+            AnimalFactory.createAnimal({ type: "bird", name: "Tweety" }),
+            AnimalFactory.createAnimal({ type: "dog", name: "Loki", age: 7 }),
+            AnimalFactory.createAnimal({ type: "horse", name: "Thunder", age: 2 }),
+        ]));
+        const animals = listOfPromises.map((item) => item.value);
+        for (let animal of animals) {
+            console.log(animal.characteristics);
+            console.log(`${animal.name} moves: ${animal.move()} ${animal instanceof Dog || animal instanceof Horse
+                ? `and makes sounds: ${animal.makeSound()}`
+                : ""}`);
+        }
+    }
+    catch (err) {
+        console.warn(err);
+    }
+})();
