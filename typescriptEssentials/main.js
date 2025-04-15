@@ -1,8 +1,8 @@
 "use strict";
 class Animal {
-    constructor({ name, calculatedAge, nationality }) {
+    constructor({ name, nationality, age }) {
         this._name = name;
-        this._age = calculatedAge;
+        this._age = age ?? name.length * 2;
         this._nationality = nationality;
     }
     get name() {
@@ -37,54 +37,42 @@ class Horse extends Animal {
         return `${super.characteristics}; it's a horse`;
     }
 }
-class MuteBird extends Animal {
+class Fish extends Animal {
     //doesn't makeSound
     move() {
-        return `flying`;
+        return `swimming`;
     }
     get characteristics() {
-        return `${super.characteristics}; it's a bird`;
+        return `${super.characteristics}; it's a fish`;
     }
 }
-class AnimalFactory {
-    static async createAnimal({ type, name, age }) {
-        const calculatedAge = age ?? name.length * 2;
-        const nationality = await AnimalFactory.createNationality(name);
-        switch (type) {
-            case "dog":
-                return new Dog({ name, calculatedAge, nationality });
-            case "horse":
-                return new Horse({ name, calculatedAge, nationality });
-            case "bird":
-                return new MuteBird({ name, calculatedAge, nationality });
-            default:
-                const exhaustiveCheck = type;
-                throw new Error(`Error: ${exhaustiveCheck}`);
-        }
-    }
-    static async createNationality(name) {
-        const firstLetter = name.charAt(0).toUpperCase();
-        const { countries } = await AnimalFactory.fetchCountries();
-        const country = countries.find((country) => country.includes(firstLetter));
-        return country ?? "RO-default";
-    }
-    static async fetchCountries() {
-        return new Promise((resolve) => {
-            setTimeout(async () => {
-                const result = await fetch("../javascriptEssentials/countries.json");
-                resolve(result.json());
-            }, 1000);
-        });
-    }
+async function fetchCountries() {
+    return new Promise((resolve) => {
+        setTimeout(async () => {
+            const result = await fetch("../javascriptEssentials/countries.json");
+            resolve(result.json());
+        }, 1000);
+    });
 }
-(async function () {
+async function createAnimals() {
     try {
-        const listOfPromises = (await Promise.allSettled([
-            AnimalFactory.createAnimal({ type: "bird", name: "Tweety" }),
-            AnimalFactory.createAnimal({ type: "dog", name: "Loki", age: 7 }),
-            AnimalFactory.createAnimal({ type: "horse", name: "Thunder", age: 2 }),
-        ]));
-        const animals = listOfPromises.map((item) => item.value);
+        const { countries } = await fetchCountries();
+        const animals = [
+            new Dog({
+                name: "Loki",
+                nationality: countries.find((country) => country.includes("L")) ?? "RO",
+            }),
+            new Horse({
+                name: "Thunder",
+                age: 14,
+                nationality: countries.find((country) => country.includes("T")) ?? "RO",
+            }),
+            new Fish({
+                name: "Nemo",
+                age: 2,
+                nationality: countries.find((country) => country.includes("N")) ?? "RO",
+            }),
+        ];
         for (let animal of animals) {
             console.log(animal.characteristics);
             console.log(`${animal.name} moves: ${animal.move()} ${animal instanceof Dog || animal instanceof Horse
@@ -95,4 +83,5 @@ class AnimalFactory {
     catch (err) {
         console.warn(err);
     }
-})();
+}
+createAnimals();
