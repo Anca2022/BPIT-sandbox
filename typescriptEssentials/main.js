@@ -49,7 +49,7 @@ class Fish extends Animal {
 async function fetchCountries() {
     return new Promise((resolve) => {
         setTimeout(async () => {
-            const result = await fetch("../javascriptEssentials/countries.json");
+            const result = await fetch("./countries.json");
             resolve(result.json());
         }, 1000);
     });

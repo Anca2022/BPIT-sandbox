@@ -9,10 +9,20 @@ type CountryData = {
 interface Talkable {
   makeSound: () => string;
 }
-abstract class Animal {
-  private _name: string;
-  private _age: number;
-  private _nationality: string;
+interface AnimalInterface {
+  move(): string;
+  get name(): string;
+  get age(): number;
+  get characteristics(): string;
+}
+interface SoundEmitterAnimalInterface extends AnimalInterface {
+  makeSound(): string;
+}
+
+abstract class Animal implements AnimalInterface {
+  protected _name: string;
+  protected _age: number;
+  protected _nationality: string;
   constructor({ name, nationality, age }: AnimalParams) {
     this._name = name;
     this._age = age ?? name.length * 2;
@@ -30,8 +40,8 @@ abstract class Animal {
     return `${this._name} is ${this._age} years old and it's nationality is: ${this._nationality}`;
   }
 }
-
-class Dog extends Animal implements Talkable {
+  
+class Dog extends Animal implements SoundEmitterAnimalInterface {
   move() {
     return "zooming";
   }
@@ -43,7 +53,7 @@ class Dog extends Animal implements Talkable {
   }
 }
 
-class Horse extends Animal implements Talkable {
+class Horse extends Animal implements SoundEmitterAnimalInterface {
   move() {
     return "galloping";
   }
@@ -68,7 +78,7 @@ class Fish extends Animal {
 async function fetchCountries(): Promise<CountryData> {
   return new Promise((resolve) => {
     setTimeout(async () => {
-      const result = await fetch("../javascriptEssentials/countries.json");
+      const result = await fetch("./countries.json");
       resolve(result.json());
     }, 1000);
   });
